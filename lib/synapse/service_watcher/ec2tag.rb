@@ -46,9 +46,15 @@ module Synapse
       end
 
       # Required, but can use well-known environment variables.
-      %w[aws_access_key_id aws_secret_access_key aws_region].each do |attr|
-        unless (@discovery[attr] || ENV[attr.upcase])
-          raise ArgumentError, "Missing #{attr} option or #{attr.upcase} environment variable"
+      if @discovery['use_iam_profile'] == false
+        %w[aws_access_key_id aws_secret_access_key aws_region].each do |attr|
+          unless (@discovery[attr] || ENV[attr.upcase])
+            raise ArgumentError, "Missing #{attr} option or #{attr.upcase} environment variable"
+          end
+        end
+      else
+        unless @discovery['aws_region']
+          raise ArgumentError, "aws region value required for service #{@name}" \
         end
       end
     end
@@ -130,4 +136,3 @@ module Synapse
     end
   end
 end
-
